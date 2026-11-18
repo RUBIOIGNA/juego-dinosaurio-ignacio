@@ -12,7 +12,7 @@ Prompt 1: Desarrollo inicial del juego
 
 "Quiero desarrollar un juego basado en el dinosaurio de Google Chrome utilizando React JS. Necesito implementar la mecánica de movimiento, los obstáculos y los controles del personaje."
 
-Prompt 2: Implementación de desafíos
+Prompt 2: Implementación de desafíos.
 
 "Quiero agregar desafíos y preguntas que aparezcan cada cierto tiempo durante la partida. Cuando aparezca un desafío, el juego debe pausarse hasta que el jugador responda."
 
