@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adventure Code: El Desafío del Apunte</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <style>
+:root { --gris: #535353; --fondo: #f7f7f7; font-family: "Courier New", ui-monospace, monospace; color: var(--gris); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); }
+.app { max-width: 720px; margin: 0 auto; padding: 16px; min-height: 100vh; position: relative; }
+.hud { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; font-family: "Press Start 2P", "Courier New", monospace; font-size: .7rem; }
+.escena { position: relative; height: 200px; max-width: 700px; overflow: hidden; user-select: none; touch-action: manipulation; }
+.linea { position: absolute; left: 0; right: 0; bottom: 28px; height: 2px; background: var(--gris); }
+.baches { position: absolute; left: 0; right: 0; height: 2px; }
+.baches.a { bottom: 20px; background: repeating-linear-gradient(90deg, var(--gris) 0 6px, transparent 6px 97px); }
+.baches.b { bottom: 12px; background: repeating-linear-gradient(90deg, var(--gris) 0 3px, transparent 3px 61px); }
+.nube { position: absolute; left: 0; width: 46px; height: 14px; border: 2px solid #c8c8c8; border-radius: 10px; }
+.dino { position: absolute; left: 40px; bottom: 30px; width: 44px; height: 44px; line-height: 0; }
+.dino svg { display: block; }
+.patasB { visibility: hidden; }
+.dino.corre .patasA { animation: patasA .2s steps(1) infinite; }
+.dino.corre .patasB { animation: patasB .2s steps(1) infinite; }
+@keyframes patasA { 0% { visibility: visible; } 50% { visibility: hidden; } }
+@keyframes patasB { 0% { visibility: hidden; } 50% { visibility: visible; } }
+.dino.herido { animation: parpadeo .15s 4; }
+@keyframes parpadeo { 50% { opacity: .15; } }
+.obs { position: absolute; bottom: 30px; display: flex; align-items: flex-end; line-height: 0; }
+.obs svg { display: block; height: 100%; flex: 1; }
+.metros { position: absolute; right: 8px; top: 8px; z-index: 2; font-weight: bold; font-family: "Press Start 2P", "Courier New", monospace; font-size: .8rem; }
+.panel { background: #fff; border: 3px solid var(--gris); padding: 24px; margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
+h1 { font-size: 1.8rem; margin: 0; letter-spacing: 2px; font-family: "Press Start 2P", "Courier New", monospace; }
+h2 { margin: 0; }
+.sub { font-size: 1.1rem; margin: 0; }
+input { font: inherit; padding: 10px; border: 2px solid var(--gris); color: var(--gris); }
+button { font: inherit; padding: 10px 14px; background: var(--gris); color: #fff; border: 2px solid var(--gris); cursor: pointer; text-align: left; }
+button:hover:enabled { background: #fff; color: var(--gris); }
+button:focus-visible, input:focus-visible { outline: 3px solid #1a73e8; outline-offset: 2px; }
+button:disabled { opacity: .5; cursor: default; }
+pre { background: var(--fondo); padding: 12px; margin: 0; overflow-x: auto; border-left: 4px solid var(--gris); }
+.overlay { position: absolute; inset: 0; background: rgba(247,247,247,.88); display: flex; align-items: flex-start; justify-content: center; padding: 16px; }
+.challenge { width: 100%; margin-top: 56px; }
+.ok { color: #2f7d4f; font-weight: bold; margin: 0; }
+.error { color: #b3382c; font-weight: bold; margin: 0; }
+.pista { margin: 0; font-style: italic; }
+.puntos { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/App.jsx"></script>
+  </body>
+</html>
