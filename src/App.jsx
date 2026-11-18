@@ -1,25 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 
-// Adventure Code: El Desafío del Apunte (versión dinosaurio de Google) — todo el juego en un solo archivo.
-// Secciones: 1) funciones auxiliares  2) datos de los desafíos  3) componentes  4) App (estado y pantallas)
-
-// ======================= 1) FUNCIONES AUXILIARES (sentencias de control) =======================
-// Funciones auxiliares con las sentencias de control del juego.
 
 const VIDAS_INICIALES = 3;
 const PUNTOS_POR_DESAFIO = 100;
 const BONUS_POR_VIDA = 50;
 
-// if: el juego no inicia con un nombre vacío.
+// el juego no inicia con un nombre vacío.
 function validarNombre(nombre) {
-  if (nombre.trim().length === 0) {
+  const limpio = nombre.trim();
+  
+  if (limpio.length === 0) {
     return false;
+  }
+  if (limpio.length > 15) {
+    return false; // muy largo
+  }
+  if (!/^\p{L}+( \p{L}+)*$/u.test(limpio)) {
+    return false; // tiene números o símbolos
   }
   return true;
 }
 
-// Desafío 1: compara el texto ingresado con las respuestas válidas.
+
+//  compara el texto ingresado con las respuestas válidas.
 function validarTexto(respuesta, validas) {
   const limpia = respuesta.trim().toLowerCase();
   return validas.includes(limpia);
@@ -30,7 +34,7 @@ function validarOpcion(elegida, correcta) {
   return elegida === correcta;
 }
 
-// switch: título según las vidas que quedaron.
+// título según las vidas que quedaron.
 function tituloPorVidas(vidas) {
   switch (vidas) {
     case 3:
@@ -44,7 +48,7 @@ function tituloPorVidas(vidas) {
   }
 }
 
-// if / else if / else: mensaje personalizado según el rendimiento.
+// mensaje personalizado según el rendimiento.
 function mensajeFinal(nombre, puntos, vidas) {
   if (puntos >= 400) {
     return `¡Excelente, ${nombre}! Dominás las sentencias de control.`;
@@ -55,12 +59,12 @@ function mensajeFinal(nombre, puntos, vidas) {
   }
 }
 
-// ======================= 2) DATOS DE LOS DESAFÍOS (editar con las preguntas del apunte) =======================
+//  DATOS DE LOS DESAFÍOS 
 // Cada desafío se activa cuando el dino alcanza el `metro` indicado.
 const DESAFIOS = [
   {
     id: 1,
-    metro: 200,
+    metro: 250,
     tipo: "texto",
     titulo: "Desafío 1: completá el código",
     consigna: 'Completá el operador ternario para que muestre "Mayor" si edad >= 18.',
@@ -107,7 +111,7 @@ const DESAFIOS = [
   },
 ];
 
-// ======================= 3a) PANTALLA INICIAL =======================
+// PANTALLA INICIAL 
 function StartScreen({ onStart }) {
   const [nombre, setNombre] = useState("");
   const [error, setError] = useState(false);
@@ -135,18 +139,19 @@ function StartScreen({ onStart }) {
         }}
       />
       {error && <p className="error">Ingresá tu nombre para empezar.</p>}
+      {error && <p className="error">Ingresá un nombre válido: solo letras y espacios (máx. 15).</p>}
       <button type="submit">Jugar</button>
     </form>
   );
 }
 
-// ======================= 3b) DESAFÍOS =======================
+//  3b) DESAFÍOS 
 function Challenge({ desafio, onCorrecto, onIncorrecto }) {
   const [texto, setTexto] = useState("");
   const [camino, setCamino] = useState(null); // 'a' | 'b' | null
   const [feedback, setFeedback] = useState(null); // { ok, msg } | null
 
-  // Pregunta activa: en el desafío 3 depende del camino elegido.
+  //  depende del camino elegido.
   const pregunta = desafio.tipo === "camino" && camino ? desafio.caminos[camino] : desafio;
 
   const resolver = (esCorrecta) => {
@@ -154,7 +159,7 @@ function Challenge({ desafio, onCorrecto, onIncorrecto }) {
       setFeedback({ ok: true, msg: `¡Correcto! ${pregunta.explicacion}` });
     } else {
       setFeedback({ ok: false, msg: "Incorrecto, perdés una vida." });
-      onIncorrecto(); // si quedan 0 vidas, App cambia a Game Over
+      onIncorrecto(); // si quedan 0 vidas, cambia a Game Over
     }
   };
 
@@ -217,7 +222,7 @@ function Challenge({ desafio, onCorrecto, onIncorrecto }) {
   );
 }
 
-// ======================= 3c) JUEGO (dinosaurio de Google corriendo y saltando) =======================
+// JUEGO (dinosaurio de Google corriendo y saltando) 
 // Sprites dibujados "pixel a pixel": cada '#' es un cuadradito del dinosaurio / cactus.
 const DINO_CUERPO = [
   ".........##########",
@@ -263,14 +268,14 @@ const DINO_W = 44;
 const GRAVEDAD = 0.6;
 const SALTO = 11.5;
 
-// Obstáculo nuevo: uno o dos cactus juntos, chicos o grandes.
+// Obstáculo uno o dos cactus juntos, chicos o grandes.
 function nuevoObstaculo() {
   const escala = Math.random() < 0.5 ? 2 : 3;
   const cantidad = Math.random() < 0.35 ? 2 : 1;
   return { x: ANCHO + 150 + Math.random() * 250, w: cantidad * 11 * escala, h: 15 * escala, n: cantidad };
 }
 
-// El loop usa refs (no useState) para no re-renderizar 60 veces por segundo.
+
 function DinoGame({ pausado, onChoque, onCheckpoint }) {
   const dinoRef = useRef(null);
   const obsRef = useRef(null);
@@ -320,7 +325,7 @@ function DinoGame({ pausado, onChoque, onCheckpoint }) {
 
         if (o.x < -o.w) j.obs = nuevoObstaculo();
 
-        // Colisión: el dino toca el cactus si se superponen en X y no saltó lo suficiente.
+        //  el dino toca el cactus si se superponen en X y no saltó lo suficiente.
         const choca = o.x < DINO_X + DINO_W - 10 && o.x + o.w > DINO_X + 10 && j.y < o.h - 8;
         if (choca) {
           j.obs = { ...nuevoObstaculo(), x: ANCHO + 200 };
@@ -389,8 +394,8 @@ function DinoGame({ pausado, onChoque, onCheckpoint }) {
   );
 }
 
-// ======================= 3d) PANTALLA FINAL (Victoria / Game Over) =======================
-function EndScreen({ victoria, nombre, puntos, vidas, onReiniciar }) {
+//  PANTALLA FINAL (Victoria / Game Over) 
+function EndScreen({ victoria, nombre, puntos, vidas, onReiniciar, onNuevoJugador }) {
   return (
     <div className="panel">
       {victoria ? (
@@ -406,18 +411,24 @@ function EndScreen({ victoria, nombre, puntos, vidas, onReiniciar }) {
         </>
       )}
       <p className="puntos">Puntaje final: {puntos}</p>
-      <button onClick={onReiniciar}>Jugar de nuevo</button>
+      
+      {/* Botones de acción */}
+      <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "15px" }}>
+        <button onClick={onReiniciar}>Jugar de nuevo</button>
+        <button onClick={onNuevoJugador} style={{ background: "#666" }}>Nuevo jugador</button>
+      </div>
     </div>
   );
 }
 
-// ======================= 4) APP: useState + renderizado condicional de pantallas =======================
+
+//  APP: useState + renderizado condicional de pantallas
 function App() {
-  const [pantalla, setPantalla] = useState("inicio"); // inicio | juego | gameover | victoria
+  const [pantalla, setPantalla] = useState("inicio"); 
   const [nombre, setNombre] = useState("");
   const [vidas, setVidas] = useState(VIDAS_INICIALES);
   const [puntos, setPuntos] = useState(0);
-  const [desafioActivo, setDesafioActivo] = useState(null); // índice o null
+  const [desafioActivo, setDesafioActivo] = useState(null); 
 
   const perderVida = () => {
     const restantes = vidas - 1;
@@ -449,6 +460,13 @@ function App() {
     setPuntos(0);
     setDesafioActivo(null);
     setPantalla("juego");
+  };
+  const nuevoJugador = () => {
+    setVidas(VIDAS_INICIALES);
+    setPuntos(0);
+    setDesafioActivo(null);
+    setNombre("");
+    setPantalla("inicio");
   };
 
   return (
@@ -483,6 +501,7 @@ function App() {
           puntos={puntos}
           vidas={vidas}
           onReiniciar={reiniciar}
+          onNuevoJugador={nuevoJugador}
         />
       )}
     </main>

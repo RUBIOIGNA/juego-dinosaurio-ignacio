@@ -1,71 +1,76 @@
-Durante el desarrollo del proyecto se utilizó ChatGPT como herramienta de asistencia técnica para consultar dudas, obtener ejemplos de código, implementar funcionalidades y detectar posibles errores.
+Herramienta utilizada: ChatGPT y Claude
 
-La IA se utilizó como apoyo durante el proceso de programación, pero las decisiones finales sobre el código, las modificaciones y las pruebas realizadas quedaron bajo mi responsabilidad.
+Los prompts principales:
 
-Prompts utilizados
+1 Quiero que cada cierto tiempo aparezca una pregunta y que el juego se pause hasta que el jugador responda
 
-A lo largo del desarrollo se realizaron diferentes consultas a la Inteligencia Artificial para resolver problemas y avanzar con la implementación del videojuego.
+2 explicame en que parte del codigo tengo que utilizar el if, else, switch, operador ternario y && en mi codigo
 
-Entre los principales prompts utilizados se encuentran:
+3 Como puedo hacer un sistemas de vidas y puntos con useState y que por cada vez que responda mal se le reste una vida y si pierde todas le aparezca el mensaje de Gamer Over
 
-Prompt 1: Desarrollo inicial del juego
+4 Tengo un problema como desaparezco el dinosuaurio cuando aparezca un desafio o que error estoy teniendo que no desaparece
 
-"Quiero desarrollar un juego basado en el dinosaurio de Google Chrome utilizando React JS. Necesito implementar la mecánica de movimiento, los obstáculos y los controles del personaje."
+Casos donde hubo un error y como los solucione
 
-Prompt 2: Implementación de desafíos.
+1 el dinosaurio seguia corriendo cuando aparecia un desafio 
 
-"Quiero agregar desafíos y preguntas que aparezcan cada cierto tiempo durante la partida. Cuando aparezca un desafío, el juego debe pausarse hasta que el jugador responda."
+despues de un sierto tiempo aparecia el desafio pero el dinosaurio seguia corriendo mejor de estar en pausa
 
-Prompt 3: Renderizado condicional
+Le pregunte a la ia en que parte del codigo estaria  mal, entonces me soluciono el problema. lo que hizo fue separar las dos responsabilidades 
 
-"Necesito solucionar cómo mostrar y ocultar los elementos del juego cuando aparece el menú de un desafío, utilizando estados de React y renderizado condicional."
+hay un estado desafioActivo (guarda qué desafío está abierto, o null si no hay ninguno).
 
-Prompt 4: Sistema de vidas y puntuación
+ 1) Le aviso al dino que se pause:
+<DinoGame
+  pausado={desafioActivo !== null}
+  onChoque={perderVida}
+  onCheckpoint={setDesafioActivo}
+/>
 
-"¿Cómo puedo implementar un sistema de vidas y puntos utilizando useState, de manera que el jugador pierda una vida cuando responde incorrectamente y el juego termine cuando llegue a cero?"
+2) Muestro el desafío SOLO si hay uno activo (operador &&):
+{desafioActivo !== null && (
+  <Challenge
+    key={desafioActivo}
+    desafio={DESAFIOS[desafioActivo]}
+    onCorrecto={desafioCorrecto}
+    onIncorrecto={perderVida}
+  />
 
-Prompt 5: Corrección de errores
+Con eso soluciono el error y cada vez que aparece un desafio el dinosaurio queda congelado detras del cartel y no se mueve no choca hasta que el jugador responda bien y le de en continuar
 
-"Estoy teniendo problemas con el funcionamiento de algunas condiciones del juego. Necesito que revises la lógica y me expliques cómo corregir los errores sin afectar el resto de las funcionalidades."
+2 El segundo error que me di cuenta es que al inicio te pide un nombre de jugador el cual si lo dejas vacio no te deja jugar hasta que lo completes, pero su lo completas con numeros o con signos si te deja. Entonces lo solucione agregando mas condiciones if a la funcion validarNombre
 
-Prompt 6: Sentencias de control
+function validarNombre(nombre) {
+  const limpio = nombre.trim();
 
-"Necesito implementar y comprender el uso de if/else, switch, operador ternario y && dentro del juego para controlar las preguntas, las respuestas y los diferentes estados de la partida."
+  if (limpio.length === 0) {
+    return false; // vacío
+  }
+  if (limpio.length > 15) {
+    return false; // muy largo
+  }
+  if (!/^\p{L}+( \p{L}+)*$/u.test(limpio)) {
+    return false; // tiene números o símbolos
+  }
+  return true;
+}
 
-Error generado por la IA y corrección técnica
+Con esto solucion errores como ingresar simbolos, numeros o nombres con muchas letras
 
-Durante el desarrollo se presentó un inconveniente con una de las soluciones de código propuestas por la Inteligencia Artificial.
+3 me di cuenta de que si un juegador piede tiene que volver a ingresar su nombre de nuevo por cada vez que pierda entonces, cuando sale la pantalla de gamer over agregue un boton que nuevo jugador en el cual ahi si tienes que ingresar un nuevo nombre de usuario y cuando le des al boton de jugar de nuevo siga con el nombre del usuario que estaba jugando
 
-Error: El dinosaurio no desaparecía al aparecer un desafío
+lo solucione agregando este boto:
+<button onClick={onNuevoJugador} style={{ background: "#666" }}>Nuevo jugador</button>
 
-Al implementar el sistema de preguntas, se solicitó a la IA una solución para pausar el juego y mostrar el menú correspondiente al desafío.
+luego la funcion 
 
-La primera solución propuesta no controlaba correctamente la visualización de todos los elementos. Como resultado, cuando aparecía el menú de preguntas, el dinosaurio seguía apareciendo en pantalla, aunque la partida estuviera pausada.
+const nuevoJugador = () => {
+    setVidas(VIDAS_INICIALES);
+    setPuntos(0);
+    setDesafioActivo(null);
+    setNombre("");
+    setPantalla("inicio");
+  };
 
-Análisis del problema
-
-El inconveniente estaba relacionado con el renderizado condicional. La condición utilizada para mostrar el menú del desafío no contemplaba correctamente la visibilidad del dinosaurio y de los demás elementos que pertenecían a la partida.
-
-Es decir, pausar el juego no significaba necesariamente ocultar sus elementos visuales, ya que eran dos comportamientos que debían controlarse por separado.
-
-Solución aplicada
-
-Se revisó la estructura del renderizado y se modificaron las condiciones para controlar qué elementos debían mostrarse dependiendo del estado actual del juego.
-
-Se utilizaron estados de React y operadores condicionales para que, cuando apareciera un desafío, los elementos correspondientes a la partida dejaran de mostrarse.
-
-De esta manera, se consiguió separar correctamente la pantalla del juego de la pantalla de preguntas.
-
-Resultado y aprendizaje
-
-Este error permitió comprender que no alcanza con solicitar una solución a la IA y copiar el código directamente. Es necesario analizar cómo funciona, probarlo dentro del proyecto y comprobar que no genere problemas en otras funcionalidades.
-
-También permitió comprender mejor la diferencia entre pausar la lógica del juego y modificar los elementos que se muestran en pantalla mediante renderizado condicional.
-
-Reflexión crítica sobre el uso de Inteligencia Artificial
-
-La utilización de ChatGPT durante el desarrollo del proyecto resultó útil para resolver dudas y avanzar con funcionalidades que requerían conocimientos de React JS.
-
-Una de las principales facilidades fue poder obtener ejemplos de código y explicaciones sobre conceptos como useState, el renderizado condicional, los eventos y las sentencias de control. Esto permitió ahorrar tiempo al momento de buscar soluciones y comprender cómo implementar determinadas características del juego.
-
-
+  y en endscreen 
+  onNuevoJugador={nuevoJugador}
